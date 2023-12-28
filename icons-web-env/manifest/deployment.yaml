@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icons-web
+  labels:
+    app: icons-web
+    part-of: new-icons
+    tier: frontend
+spec:
+  selector:
+    matchLabels:
+      app: icons-web
+      part-of: new-icons
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: icons-web
+        part-of: new-icons
+        tier: frontend
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: icons-web-config
+      containers:
+      - name: icons-web
+        image: "gcr.io/new-icons-jtb-dev/icons-web:ec97db91-a933-4b0b-85e9-f50f505e7745"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: 256Mi
+            cpu: 500m
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - name: config
+            mountPath: '/usr/share/nginx/html/js/config.js'
+            subPath: 'config.js'

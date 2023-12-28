@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mto-service
+  labels:
+    app: mto-service
+    part-of: new-icons
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: mto-service
+      part-of: new-icons
+      tier: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mto-service
+        part-of: new-icons
+        tier: backend
+    spec:
+      volumes:
+        - name: config
+          secret:
+            secretName: pubsub-sa
+      containers:
+      - name: mto-service
+        image: "gcr.io/new-icons-jtb-dev/mto-service:d8f39f4f-c231-4662-9eea-ff3732206bcd"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: 512Mi
+            cpu: 500m
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: mto-service-config
+        - secretRef:
+            name: mto-service-secret
+        volumeMounts:
+          - name: config
+            mountPath: '/src/src/config/pubsub-sa.json'
+            subPath: 'pubsub-sa.json'
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        lifecycle:
+          postStart:
+            exec:
+              command: ["sh", "-c", "gcsfuse -o allow_other --only-dir mto-service/ $MOUNT_BUCKET /src/uploads"]
+          preStop:
+            exec:
+              command: ["sh", "-c", "fusermount -u /src/uploads"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mto-service-worker
+  labels:
+    app: mto-service-worker
+    part-of: new-icons
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: mto-service-worker
+      part-of: new-icons
+      tier: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mto-service-worker
+        part-of: new-icons
+        tier: backend
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      volumes:
+        - name: config
+          secret:
+            secretName: pubsub-sa
+      containers:
+      - name: mto-service
+        image: "gcr.io/new-icons-jtb-dev/mto-service:d8f39f4f-c231-4662-9eea-ff3732206bcd"
+        command: ["node"]
+        args: ["src/worker.js"]
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: 512Mi
+            cpu: 500m
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: mto-service-config
+        - secretRef:
+            name: mto-service-secret
+        volumeMounts:
+          - name: config
+            mountPath: '/src/src/config/pubsub-sa.json'
+            subPath: 'pubsub-sa.json'
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        lifecycle:
+          postStart:
+            exec:
+              command: ["sh", "-c", "gcsfuse -o allow_other --only-dir mto-service/ $MOUNT_BUCKET /src/uploads"]
+          preStop:
+            exec:
+              command: ["sh", "-c", "fusermount -u /src/uploads"]

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: socket-service-config
+  labels:
+    app: socket-service
+data:
+  # ENV for App
+  NODE_ENV: production
+  PORT: "3000"
+  PUBSUB_ENDPOINT: "pubsub.googleapis.com"

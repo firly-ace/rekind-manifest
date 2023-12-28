@@ -1,0 +1,27 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: data-pump
+  labels:
+    app: data-pump
+    part-of: new-icons
+    tier: backend
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        spec:
+          containers:
+          - name: data-pump
+            image: "gcr.io/new-icons-jtb-dev/data-pump:BUILD_ID"
+            imagePullPolicy: IfNotPresent
+            envFrom:
+            - configMapRef:
+                name: data-pump-config
+            - secretRef:
+                name: data-pump-secret
+          restartPolicy: OnFailure

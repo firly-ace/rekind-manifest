@@ -1,0 +1,13 @@
+# ignore all the usual file under each directory
+**/node_modules/
+**/.git/
+ext-rekind-mobile
+
+# ignore all dir that does not end with -env
+!**/*-env/
+
+# ignore all dir that ends with -service
+**/*-service/
+**/*-pump/
+**/*-web/
+

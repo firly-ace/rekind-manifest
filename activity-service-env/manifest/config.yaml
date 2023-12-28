@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: activity-service-config
+  labels:
+    app: activity-service
+data:
+  GCLOUD_PROJECT: new-icons-jtb-prod
+  NODE_ENV: production
+  PORT: "8080"
+  USER_SERVICE: http://user-service

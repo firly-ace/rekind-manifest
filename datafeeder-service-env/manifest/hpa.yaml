@@ -1,0 +1,47 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: datafeeder-service
+  labels:
+    app: datafeeder-service
+    part-of: new-icons
+    tier: backend
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: datafeeder-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: datafeeder-service-worker
+  labels:
+    app: datafeeder-service-worker
+    part-of: new-icons
+    tier: backend
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - external:
+      metric:
+       name: pubsub.googleapis.com|subscription|num_undelivered_messages
+       selector:
+         matchLabels:
+           resource.labels.subscription_id: mto.drawing.imported.worker
+      target:
+        type: AverageValue
+        averageValue: 2
+    type: External
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: datafeeder-service-worker

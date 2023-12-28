@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bq-service-config
+  labels:
+    app: bq-service
+data:
+  DB_HOST: 10.42.16.2
+  DB_INSTANCE: new-icons-jtb-dev:asia-southeast2:new-icons-dev
+  DB_NAME: bq_service
+  GCLOUD_PROJECT: new-icons-jtb-prod
+  NODE_ENV: production
+  PORT: "8080"
+  MOUNT_BUCKET: new-icons-jtb-static-file-prod
+  USER_SERVICE: http://user-service
+  PROJECT_SERVICE: http://project-service
+  GCS_BQ_EXPORT_URL: https://storage.googleapis.com/new-icons-jtb-static-file-prod/bq-service/

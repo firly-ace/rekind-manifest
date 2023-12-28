@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datafeeder-service
+  labels:
+    app: datafeeder-service
+    part-of: new-icons
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: datafeeder-service
+      part-of: new-icons
+      tier: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: datafeeder-service
+        part-of: new-icons
+        tier: backend
+    spec:
+      volumes:
+        - name: config
+          secret:
+            secretName: pubsub-sa
+      containers:
+      - name: datafeeder-service
+        image: "gcr.io/new-icons-jtb-dev/datafeeder-service:1898ddec-5759-4d4d-8194-3608ee88973d"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: 1024Mi
+            cpu: 500m
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: datafeeder-service-config
+        - secretRef:
+            name: datafeeder-service-secret
+        volumeMounts:
+          - name: config
+            mountPath: '/src/src/config/pubsub-sa.json'
+            subPath: 'pubsub-sa.json'
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        lifecycle:
+          postStart:
+            exec:
+              command: ["sh", "-c", "gcsfuse -o allow_other --only-dir datafeeder-service/ $MOUNT_BUCKET /src/uploads"]
+          preStop:
+            exec:
+              command: ["sh", "-c", "fusermount -u /src/uploads"]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datafeeder-service-worker
+  labels:
+    app: datafeeder-service-worker
+    part-of: new-icons
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: datafeeder-service-worker
+      part-of: new-icons
+      tier: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: datafeeder-service-worker
+        part-of: new-icons
+        tier: backend
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      volumes:
+        - name: config
+          secret:
+            secretName: pubsub-sa
+      containers:
+      - name: datafeeder-service-worker
+        image: "gcr.io/new-icons-jtb-dev/datafeeder-service:1898ddec-5759-4d4d-8194-3608ee88973d"
+        command: ["node"]
+        args: ["src/worker.js"]
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: datafeeder-service-config
+        volumeMounts:
+          - name: config
+            mountPath: '/src/src/config/pubsub-sa.json'
+            subPath: 'pubsub-sa.json'
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        lifecycle:
+          postStart:
+            exec:
+              command: ["sh", "-c", "gcsfuse -o allow_other --only-dir datafeeder-service/ $MOUNT_BUCKET /src/uploads"]
+          preStop:
+            exec:
+              command: ["sh", "-c", "fusermount -u /src/uploads"]

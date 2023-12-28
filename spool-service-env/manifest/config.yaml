@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spool-management-service-config
+  labels:
+    app: spool-management-service
+data:
+  DB_HOST: 10.42.16.2
+  DB_INSTANCE: new-icons-jtb-dev:asia-southeast2:new-icons-dev
+  DB_NAME: spool_service
+  GCLOUD_PROJECT: new-icons-jtb-prod
+  NODE_ENV: production
+  PORT: "8080"
+  MOUNT_BUCKET: new-icons-jtb-static-file-prod
+  GCS_SPOOL_EXPORT_URL: https://storage.googleapis.com/new-icons-jtb-static-file-prod/spool-service/
+  USER_SERVICE: http://user-service

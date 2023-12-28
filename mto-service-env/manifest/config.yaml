@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mto-service-config
+  labels:
+    app: mto-service
+data:
+  DB_HOST: 10.42.16.2
+  DB_INSTANCE: new-icons-jtb-dev:asia-southeast2:new-icons-dev
+  DB_NAME: mto_service
+  GCLOUD_PROJECT: new-icons-jtb-prod
+  NODE_ENV: production
+  PORT: "8080"
+  MOUNT_BUCKET: new-icons-jtb-static-file-prod
+  GCS_MTO_EXPORT_URL: https://storage.googleapis.com/new-icons-jtb-static-file-prod/mto-service/

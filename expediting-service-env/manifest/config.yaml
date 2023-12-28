@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: expediting-service-config
+  labels:
+    app: expediting-service
+data:
+  DB_HOST: 10.42.16.2
+  DB_INSTANCE: new-icons-jtb-dev:asia-southeast2:new-icons-dev
+  DB_NAME: exp_service
+  GCLOUD_PROJECT: new-icons-jtb-prod
+  NODE_ENV: production
+  PORT: "8080"
+  PO_SERVICE: http://po-service

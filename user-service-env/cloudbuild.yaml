@@ -1,0 +1,25 @@
+steps:
+- id: deploy
+  name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - 'manifest'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=$_CLOUDSDK_COMPUTE_ZONE'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=$_CLOUDSDK_CONTAINER_CLUSTER'
+
+- id: copy-to-master
+  name: 'gcr.io/cloud-builders/git'
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - |
+    gcloud source repos clone ${_ENV_REPO} ${_ENV_REPO}-temp && \
+    cd ${_ENV_REPO}-temp && \
+    set -x && \
+    git config user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)') && \
+    git checkout master && \
+    git checkout $COMMIT_SHA manifest/deployment.yaml && \
+    git commit -m "Manifest from commit https://source.cloud.google.com/new-icons-jtb-dev/${_ENV_REPO}/+/$COMMIT_SHA - $(git log --format=%B -n 1 $COMMIT_SHA)" && \
+    git push -u origin master

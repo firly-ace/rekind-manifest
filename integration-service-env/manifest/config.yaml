@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: integration-service-config
+  labels:
+    app: integration-service
+data:
+  # ENV for App
+  NODE_ENV: production
+
+  DB_HOST: 104.197.5.250
+  DB_PORT: "4379"
+  DB_NAME_MASTER: DBC2019001
+  DB_NAME_WMS: WMSMULTI
+  DB_NAME_FMCS: project_jtb2pip
+  DB_NAME_EPRO: DBA2018003
+  PORT: "3000"
+  UPLOAD_PATH: http://34.101.161.174/uploads/

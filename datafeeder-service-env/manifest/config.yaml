@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datafeeder-service-config
+  labels:
+    app: datafeeder-service
+data:
+  DB_HOST: 10.42.16.2
+  DB_NAME: feeder_service
+  GCLOUD_PROJECT: new-icons-jtb-prod
+  NODE_ENV: production
+  PORT: "8080"
+  PROJECT_SERVICE: http://project-service
+  PUBSUB_ENDPOINT: pubsub.googleapis.com
+  MOUNT_BUCKET: new-icons-jtb-static-file-prod

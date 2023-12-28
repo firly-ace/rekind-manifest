@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: icons-web-config
+  labels:
+    app: icons-web
+data:
+  config.js: |
+    window.env = {
+      BASE_API: "https://icons.rekayasa.co.id/api/v1",
+      BASE_SOCKET_URL: "https://icons.rekayasa.co.id",
+      GMAPS_KEY: "AIzaSyBBQd2JNKwHcmKQSz5-48zqyMeHFgfVcdQ",
+      BASE_BUCKET_URL: "https://storage.googleapis.com/new-icons-jtb-static-file-prod/shipping-service/",
+    }

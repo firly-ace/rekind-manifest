@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: project-service-config
+  labels:
+    app: project-service
+data:
+  DB_HOST: 10.42.16.2
+  DB_INSTANCE: new-icons-jtb-dev:asia-southeast2:new-icons-dev
+  DB_NAME: project_service
+  GCLOUD_PROJECT: new-icons-jtb-prod
+  NODE_ENV: production
+  PORT: "8080"
+  USER_SERVICE: http://user-service

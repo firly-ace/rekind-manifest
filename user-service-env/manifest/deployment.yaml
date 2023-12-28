@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+    part-of: new-icons
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: user-service
+      part-of: new-icons
+      tier: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: user-service
+        part-of: new-icons
+        tier: backend
+    spec:
+      volumes:
+        - name: config
+          secret:
+            secretName: pubsub-sa
+      containers:
+      - name: user-service
+        image: "gcr.io/new-icons-jtb-dev/user-service:c7866dab-eb0c-44f5-a1af-36bac32a40e4"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: 256Mi
+            cpu: 500m
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: user-service-config
+        - secretRef:
+            name: user-service-secret
+        volumeMounts:
+          - name: config
+            mountPath: '/src/src/config/pubsub-sa.json'
+            subPath: 'pubsub-sa.json'
